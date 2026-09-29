@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Разработка премиум сайтов</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <!-- Подключение иконок FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            color: #2c3e50;
+            overflow-x: hidden;
+            /* Легкий фоновый паттерн */
+            background-image: radial-gradient(#d5d8dc 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        /* Анимации */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(37, 211, 102, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+        }
+
+        .animate {
+            animation: fadeInUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            opacity: 0;
+        }
+        .delay-1 { animation-delay: 0.3s; }
+        .delay-2 { animation-delay: 0.6s; }
+
+        /* Шапка */
+        header {
+            background: linear-gradient(135deg, rgba(15, 32, 39, 0.95), rgba(32, 58, 67, 0.95), rgba(44, 83, 100, 0.95)), 
+                        url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            color: #fff;
+            padding: 150px 20px;
+            text-align: center;
+            border-bottom: 5px solid #D4AF37;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 4em;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-shadow: 2px 4px 10px rgba(0,0,0,0.5);
+        }
+        header h1 span { color: #D4AF37; }
+        header p {
+            font-size: 1.4em;
+            font-weight: 300;
+            color: #ecf0f1;
+            margin-top: 25px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+            text-shadow: 1px 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .container {
+            max-width: 1000px; /* Сделал контейнер чуть уже для одной карточки */
+            margin: 80px auto;
+            padding: 0 20px;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 3em;
+            font-weight: 800;
+            margin-bottom: 60px;
+            color: #2c3e50;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background-color: #D4AF37;
+            margin: 20px auto 0;
+            border-radius: 2px;
+        }
+
+        /* Премиум Карточка портфолио */
+        .card {
+            background: #fff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .card:hover {
+            transform: translateY(-20px);
+            box-shadow: 0 30px 60px rgba(212, 175, 55, 0.25);
+            border-color: #D4AF37;
+        }
+        .card-img {
+            height: 400px; /* Увеличил высоту картинки */
+            background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .card-img::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(to top, rgba(255,255,255,1), rgba(255,255,255,0));
+        }
+        .card-content {
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        .card h3 {
+            margin: 0 0 15px 0;
+            font-size: 2.2em;
+            font-weight: 800;
+            color: #1a1a1a;
+        }
+        .card p {
+            color: #555;
+            font-size: 1.2em;
+            line-height: 1.8;
+            margin-bottom: 35px;
+            font-weight: 500;
+        }
+        .btn-view {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #121212, #2c3e50);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .card:hover .btn-view {
+            background: linear-gradient(135deg, #D4AF37, #f1c40f);
+            color: #121212;
+            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
+        }
+
+        /* Обновленный блок контактов */
+        .contact-section {
+            text-align: center;
+            margin-top: 100px;
+            padding: 80px 20px;
+            /* Измененный фон: глубокий сине-фиолетовый градиент */
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: white;
+            border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Декоративные элементы на фоне контактов */
+        .contact-section::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+        }
+        .contact-section::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            right: -80px;
+            width: 300px;
+            height: 300px;
+            background: rgba(212, 175, 55, 0.05);
+            border-radius: 50%;
+        }
+
+        .contact-section h2 {
+            font-size: 2.8em;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #fff;
+            position: relative;
+            z-index: 1;
+        }
+        .contact-section p {
+            font-size: 1.3em;
+            color: #bdc3c7;
+            margin-bottom: 40px;
+            font-weight: 300;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .whatsapp-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            background-color: #25D366;
+            color: white;
+            text-decoration: none;
+            font-size: 1.3em;
+            font-weight: 800;
+            padding: 20px 50px;
+            border-radius: 50px;
+            animation: pulse 2.5s infinite;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
+        }
+        .whatsapp-btn i {
+            font-size: 1.5em;
+        }
+        .whatsapp-btn:hover {
+            transform: translateY(-5px) scale(1.02);
+            background-color: #20b858;
+            box-shadow: 0 15px 35px rgba(37, 211, 102, 0.6);
+        }
+        
+        .phone-number {
+            margin-top: 30px;
+            font-size: 1.2em;
+            color: #ecf0f1;
+            position: relative;
+            z-index: 1;
+        }
+        .phone-number i {
+            color: #D4AF37;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Шапка -->
+    <header class="animate">
+        <h1>Мы создаём <span>сайты</span></h1>
+        <p>Эксклюзивный дизайн, передовые технологии и безупречное исполнение. Мы превращаем идеи в мощные инструменты для вашего бизнеса.</p>
+    </header>
+
+    <div class="container">
+        <h2 class="section-title animate delay-1">Флагманский проект</h2>
+        
+        <!-- Единственная карточка: Bauyrdaq -->
+        <div class="card animate delay-2">
+            <div class="card-img"></div>
+            <div class="card-content">
+                <h3>Премиум Ресторан "Bauyrdaq"</h3>
+                <p>Комплексная разработка веб-представительства для семейного ресторана. Проект включает в себя уникальный дизайн, интерактивное меню категорий и полную адаптацию под мобильные устройства.</p>
+                <a href="index.html" target="_blank" class="btn-view">Оценить проект <i class="fas fa-arrow-right" style="margin-left: 10px;"></i></a>
+            </div>
+        </div>
+
+        <!-- Обновленный блок контактов -->
+        <div class="contact-section animate delay-2">
+            <h2>Готовы к цифровой трансформации?</h2>
+            <p>Свяжитесь с нами, и мы разработаем сайт, который выделит вас среди конкурентов.</p>
+            
+            <a href="https://wa.me/77079582582" class="whatsapp-btn" target="_blank">
+                <i class="fab fa-whatsapp"></i> НАПИСАТЬ В WHATSAPP
+            </a>
+            
+            <div class="phone-number">
+                <p><i class="fas fa-phone-alt"></i> Прямая связь: <strong>+7 (707) 958-25-82</strong></p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
