@@ -3,297 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Разработка премиум сайтов</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700;900&display=swap" rel="stylesheet">
-    <!-- Подключение иконок FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>ADIL | Frontend Разработчик</title>
+    
+    <!-- Подключаем Tailwind CSS для стилей -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in-up': 'fadeInUp 1s ease-out forwards',
+                        'bounce-slow': 'bounce 3s infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f2f5;
-            color: #2c3e50;
-            overflow-x: hidden;
-            /* Легкий фоновый паттерн */
-            background-image: radial-gradient(#d5d8dc 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
+        /* Плавный скролл */
+        html { scroll-behavior: smooth; background-color: #030712; }
         
-        /* Анимации */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(50px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7); }
-            70% { box-shadow: 0 0 0 20px rgba(37, 211, 102, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
-        }
-
-        .animate {
-            animation: fadeInUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        /* Стили для анимации текста (BlurText эффект) */
+        .blur-text-element {
+            display: inline-block;
             opacity: 0;
-        }
-        .delay-1 { animation-delay: 0.3s; }
-        .delay-2 { animation-delay: 0.6s; }
-
-        /* Шапка */
-        header {
-            background: linear-gradient(135deg, rgba(15, 32, 39, 0.95), rgba(32, 58, 67, 0.95), rgba(44, 83, 100, 0.95)), 
-                        url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
-            color: #fff;
-            padding: 150px 20px;
-            text-align: center;
-            border-bottom: 5px solid #D4AF37;
-        }
-        header h1 {
-            margin: 0;
-            font-size: 4em;
-            font-weight: 900;
-            letter-spacing: 2px;
-            text-shadow: 2px 4px 10px rgba(0,0,0,0.5);
-        }
-        header h1 span { color: #D4AF37; }
-        header p {
-            font-size: 1.4em;
-            font-weight: 300;
-            color: #ecf0f1;
-            margin-top: 25px;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-            line-height: 1.6;
-            text-shadow: 1px 2px 5px rgba(0,0,0,0.5);
+            filter: blur(10px);
+            transform: translateY(10px);
+            animation: unblur 0.8s ease-out forwards;
         }
 
-        .container {
-            max-width: 1000px; /* Сделал контейнер чуть уже для одной карточки */
-            margin: 80px auto;
-            padding: 0 20px;
-        }
-        
-        .section-title {
-            text-align: center;
-            font-size: 3em;
-            font-weight: 800;
-            margin-bottom: 60px;
-            color: #2c3e50;
-            position: relative;
-        }
-        .section-title::after {
-            content: '';
-            display: block;
-            width: 80px;
-            height: 4px;
-            background-color: #D4AF37;
-            margin: 20px auto 0;
-            border-radius: 2px;
+        @keyframes unblur {
+            to { opacity: 1; filter: blur(0); transform: translateY(0); }
         }
 
-        /* Премиум Карточка портфолио */
-        .card {
-            background: #fff;
-            border-radius: 24px;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-            display: flex;
-            flex-direction: column;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        .card:hover {
-            transform: translateY(-20px);
-            box-shadow: 0 30px 60px rgba(212, 175, 55, 0.25);
-            border-color: #D4AF37;
-        }
-        .card-img {
-            height: 400px; /* Увеличил высоту картинки */
-            background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80');
-            background-size: cover;
-            background-position: center;
-            position: relative;
-        }
-        .card-img::after {
-            content: '';
+        /* Канвас для анимации Silk на фоне */
+        #silk-canvas {
             position: absolute;
-            bottom: 0;
+            top: 0;
             left: 0;
             width: 100%;
-            height: 50%;
-            background: linear-gradient(to top, rgba(255,255,255,1), rgba(255,255,255,0));
+            height: 100%;
+            z-index: 0;
+            opacity: 0.8;
+            pointer-events: none;
         }
-        .card-content {
-            padding: 40px;
-            text-align: center;
+        
+        /* Интерактивная карточка проекта */
+        .spotlight-card {
             position: relative;
-            z-index: 1;
-        }
-        .card h3 {
-            margin: 0 0 15px 0;
-            font-size: 2.2em;
-            font-weight: 800;
-            color: #1a1a1a;
-        }
-        .card p {
-            color: #555;
-            font-size: 1.2em;
-            line-height: 1.8;
-            margin-bottom: 35px;
-            font-weight: 500;
-        }
-        .btn-view {
-            display: inline-block;
-            padding: 15px 40px;
-            background: linear-gradient(135deg, #121212, #2c3e50);
-            color: #fff;
-            text-decoration: none;
-            border-radius: 50px;
-            font-size: 1.1em;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-        .card:hover .btn-view {
-            background: linear-gradient(135deg, #D4AF37, #f1c40f);
-            color: #121212;
-            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
-        }
-
-        /* Обновленный блок контактов */
-        .contact-section {
-            text-align: center;
-            margin-top: 100px;
-            padding: 80px 20px;
-            /* Измененный фон: глубокий сине-фиолетовый градиент */
-            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-            color: white;
-            border-radius: 30px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
-            position: relative;
+            background: rgba(17, 24, 39, 0.5); /* bg-gray-900/50 */
+            border-radius: 1.5rem;
+            border: 1px solid rgba(31, 41, 55, 1); /* border-gray-800 */
             overflow: hidden;
-        }
-        
-        /* Декоративные элементы на фоне контактов */
-        .contact-section::before {
-            content: '';
-            position: absolute;
-            top: -50px;
-            left: -50px;
-            width: 200px;
-            height: 200px;
-            background: rgba(212, 175, 55, 0.1);
-            border-radius: 50%;
-        }
-        .contact-section::after {
-            content: '';
-            position: absolute;
-            bottom: -80px;
-            right: -80px;
-            width: 300px;
-            height: 300px;
-            background: rgba(212, 175, 55, 0.05);
-            border-radius: 50%;
+            transition: border-color 0.5s ease;
         }
 
-        .contact-section h2 {
-            font-size: 2.8em;
-            font-weight: 800;
-            margin-bottom: 20px;
-            color: #fff;
-            position: relative;
-            z-index: 1;
-        }
-        .contact-section p {
-            font-size: 1.3em;
-            color: #bdc3c7;
-            margin-bottom: 40px;
-            font-weight: 300;
-            position: relative;
+        .spotlight-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(123, 57, 179, 0.15), transparent 40%);
+            opacity: 0;
+            transition: opacity 0.5s;
+            pointer-events: none;
             z-index: 1;
         }
         
-        .whatsapp-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            background-color: #25D366;
-            color: white;
-            text-decoration: none;
-            font-size: 1.3em;
-            font-weight: 800;
-            padding: 20px 50px;
-            border-radius: 50px;
-            animation: pulse 2.5s infinite;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
-        }
-        .whatsapp-btn i {
-            font-size: 1.5em;
-        }
-        .whatsapp-btn:hover {
-            transform: translateY(-5px) scale(1.02);
-            background-color: #20b858;
-            box-shadow: 0 15px 35px rgba(37, 211, 102, 0.6);
-        }
+        .spotlight-card:hover::before { opacity: 1; }
+        .spotlight-card:hover { border-color: rgba(123, 57, 179, 0.5); }
         
-        .phone-number {
-            margin-top: 30px;
-            font-size: 1.2em;
-            color: #ecf0f1;
-            position: relative;
-            z-index: 1;
-        }
-        .phone-number i {
-            color: #D4AF37;
-            margin-right: 10px;
-        }
+        .spotlight-content { position: relative; z-index: 2; }
     </style>
 </head>
-<body>
+<body class="bg-gray-950 text-white selection:bg-[#7b39b3] selection:text-white font-sans overflow-x-hidden min-h-screen">
 
-    <!-- Шапка -->
-    <header class="animate">
-        <h1>Мы создаём <span>сайты</span></h1>
-        <p>Эксклюзивный дизайн, передовые технологии и безупречное исполнение. Мы превращаем идеи в мощные инструменты для вашего бизнеса.</p>
-    </header>
-
-    <div class="container">
-        <h2 class="section-title animate delay-1">Флагманский проект</h2>
+    <!-- HERO SECTION (Главный экран с анимацией Silk) -->
+    <section class="relative w-full h-screen flex flex-col justify-center items-center overflow-hidden">
         
-        <!-- Единственная карточка: Bauyrdaq -->
-        <div class="card animate delay-2">
-            <div class="card-img"></div>
-            <div class="card-content">
-                <h3>Премиум Ресторан "Bauyrdaq"</h3>
-                <p>Комплексная разработка веб-представительства для семейного ресторана. Проект включает в себя уникальный дизайн, интерактивное меню категорий и полную адаптацию под мобильные устройства.</p>
-                <a href="index.html" target="_blank" class="btn-view">Оценить проект <i class="fas fa-arrow-right" style="margin-left: 10px;"></i></a>
-            </div>
-        </div>
+        <!-- Канвас для фона Silk -->
+        <canvas id="silk-canvas"></canvas>
 
-        <!-- Обновленный блок контактов -->
-        <div class="contact-section animate delay-2">
-            <h2>Готовы к цифровой трансформации?</h2>
-            <p>Свяжитесь с нами, и мы разработаем сайт, который выделит вас среди конкурентов.</p>
-            
-            <a href="https://wa.me/77079582582" class="whatsapp-btn" target="_blank">
-                <i class="fab fa-whatsapp"></i> НАПИСАТЬ В WHATSAPP
+        <!-- Затемнение снизу для плавного перехода -->
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-gray-950/40 to-gray-950 z-0 pointer-events-none"></div>
+
+        <!-- Шапка -->
+        <nav class="absolute top-0 w-full flex justify-between items-center p-6 md:px-12 z-20">
+            <div class="text-xl font-black tracking-[0.2em] text-white/90">
+                ADIL
+            </div>
+            <a href="#projects" class="text-sm uppercase tracking-widest hover:text-[#7b39b3] transition-colors">
+                Проекты
             </a>
+        </nav>
+
+        <!-- Центральный контент (Поверх Silk) -->
+        <div class="relative z-10 text-center px-4 max-w-4xl mx-auto flex flex-col items-center mt-10">
             
-            <div class="phone-number">
-                <p><i class="fas fa-phone-alt"></i> Прямая связь: <strong>+7 (707) 958-25-82</strong></p>
+            <div class="inline-block px-4 py-1.5 mb-6 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-sm font-medium animate-fade-in-up">
+                👋 Frontend Разработчик
+            </div>
+
+            <!-- Анимированный заголовок -->
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter mb-6 text-white drop-shadow-lg" id="blur-title"></h1>
+            
+            <p class="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-10 opacity-0 animate-fade-in-up" style="animation-delay: 0.6s;">
+                Превращаю сложные идеи в элегантные и производительные веб-интерфейсы. 
+                Фокус на React, анимациях и идеальном UX.
+            </p>
+
+            <a href="#projects" class="group relative px-8 py-4 bg-white text-black font-semibold rounded-full overflow-hidden transition-all hover:scale-105 opacity-0 animate-fade-in-up" style="animation-delay: 0.9s;">
+                <div class="absolute inset-0 bg-gradient-to-r from-[#7b39b3] to-purple-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <span class="relative z-10 group-hover:text-white transition-colors duration-300">
+                    Смотреть проекты
+                </span>
+            </a>
+        </div>
+
+        <!-- Индикатор скролла вниз -->
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 opacity-50 animate-bounce-slow pointer-events-none">
+            <span class="text-xs tracking-widest uppercase">Вниз</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+        </div>
+    </section>
+
+    <!-- SECTION PROJECTS -->
+    <section id="projects" class="max-w-6xl mx-auto px-6 py-32 relative z-10">
+        <h2 class="text-3xl md:text-5xl font-bold mb-16 flex items-center gap-6">
+            <span class="w-16 h-[2px] bg-[#7b39b3]"></span>
+            Избранное
+        </h2>
+
+        <!-- Карточка Bauyrdaq -->
+        <div class="spotlight-card w-full group">
+            <div class="spotlight-content p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row gap-12 items-center">
+                
+                <!-- Информация о проекте -->
+                <div class="flex-1 order-2 lg:order-1">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#7b39b3]/20 text-[#c88eff] rounded-full text-xs font-semibold mb-6">
+                        <span class="w-2 h-2 rounded-full bg-[#7b39b3] animate-pulse"></span>
+                        Web Development
+                    </div>
+                    
+                    <h3 class="text-5xl font-black mb-6 tracking-tight text-white group-hover:text-[#c88eff] transition-colors">
+                        Bauyrdaq
+                    </h3>
+                    
+                    <p class="text-gray-400 text-lg mb-8 leading-relaxed">
+                        Полноценный веб-сайт, разработанный для бренда Bauyrdaq. 
+                        Интуитивно понятный интерфейс, современный дизайн и высокая производительность, 
+                        чтобы максимально эффективно представить продукт пользователям.
+                    </p>
+                    
+                    <div class="flex gap-3 flex-wrap mb-10">
+                        <span class="px-4 py-2 border border-gray-700 bg-gray-800/50 rounded-lg text-sm text-gray-300 backdrop-blur-sm">HTML</span>
+                        <span class="px-4 py-2 border border-gray-700 bg-gray-800/50 rounded-lg text-sm text-gray-300 backdrop-blur-sm">CSS</span>
+                        <span class="px-4 py-2 border border-gray-700 bg-gray-800/50 rounded-lg text-sm text-gray-300 backdrop-blur-sm">JavaScript</span>
+                    </div>
+                    
+                    <!-- Ссылка на сайт -->
+                    <a href="https://deeptime52-cloud.github.io/bauyrdaq.kz/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-white font-medium hover:text-[#7b39b3] transition-colors group/link">
+                        Открыть проект 
+                        <svg class="transform group-hover/link:translate-x-1 transition-transform" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+
+                <!-- Место под скриншот (Изображение вставлено) -->
+                <div class="flex-1 w-full lg:w-[500px] aspect-[16/9] bg-gray-950 rounded-2xl relative overflow-hidden order-1 lg:order-2 border border-gray-800 group/img">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-[#7b39b3]/20 to-transparent z-10 pointer-events-none mix-blend-overlay"></div>
+                    
+                    <!-- Само изображение. Обязательно чтобы файл image_a25f18.png лежал рядом с index.html -->
+                    <img src="image_a25f18.png" alt="Bauyrdaq" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-1000 ease-in-out relative z-0">
+                </div>
+
             </div>
         </div>
-    </div>
+    </section>
 
+    <!-- SECTION CONTACT & FOOTER -->
+    <footer id="contact" class="border-t border-gray-800 mt-10 relative z-10 bg-gray-950 pt-20 pb-10">
+        <div class="max-w-4xl mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold mb-6 text-white">Давайте работать вместе</h2>
+            <p class="text-gray-400 mb-10 text-lg">Готов обсудить новые проекты и идеи.</p>
+            
+            <div class="flex flex-col sm:flex-row justify-center gap-4 mb-20">
+                <!-- Кнопка WhatsApp -->
+                <a href="https://wa.me/77079582582" target="_blank" rel="noopener noreferrer" class="px-8 py-4 bg-[#25D366]/10 text-[#25D366] border border-[#25D366]/30 font-semibold rounded-full hover:bg-[#25D366] hover:text-white transition-all flex items-center justify-center gap-3">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                    Написать в WhatsApp
+                </a>
+                
+                <!-- Кнопка Позвонить -->
+                <a href="tel:+77079582582" class="px-8 py-4 bg-white/5 text-white border border-white/10 font-semibold rounded-full hover:bg-white/10 transition-all flex items-center justify-center gap-3">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    Позвонить
+                </a>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 pt-8 border-t border-gray-800">
+                <div class="text-xl font-black tracking-[0.2em] text-white/30">
+                    ADIL
+                </div>
+                <div class="flex gap-8">
+                    <a href="https://wa.me/77079582582" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-gray-400 hover:text-[#7b39b3] transition-colors">WhatsApp</a>
+                    <a href="#" class="text-sm font-medium text-gray-400 hover:text-[#7b39b3] transition-colors">Telegram</a>
+                    <a href="#" class="text-sm font-medium text-gray-400 hover:text-[#7b39b3] transition-colors">LinkedIn</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- СКРИПТЫ -->
+    <script>
+        // --- 1. Анимация появления заголовка (BlurText) ---
+        const text = "Создаю цифровую эстетику.";
+        const container = document.getElementById('blur-title');
+        
+        text.split(' ').forEach((word, index) => {
+            const span = document.createElement('span');
+            span.textContent = word + ' ';
+            span.className = 'blur-text-element whitespace-nowrap';
+            span.style.animationDelay = `${index * 0.15}s`;
+            container.appendChild(span);
+        });
+
+        // --- 2. Интерактивная карточка проекта (Spotlight) ---
+        const cards = document.querySelectorAll('.spotlight-card');
+        cards.forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // --- 3. Генерация фона "Silk" на Canvas ---
+        // Имитация эффекта Silk (шелковые волны)
+        const canvas = document.getElementById('silk-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let time = 0;
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function drawSilk() {
+            ctx.clearRect(0, 0, width, height);
+            
+            ctx.strokeStyle = 'rgba(123, 57, 179, 0.15)'; 
+            ctx.lineWidth = 1;
+
+            const linesCount = 40;
+            const spacing = height / linesCount;
+
+            ctx.beginPath();
+            for (let i = 0; i < linesCount; i++) {
+                const yOffset = i * spacing;
+                
+                for (let x = 0; x < width; x += 10) {
+                    const noise = Math.sin(x * 0.005 + time) * 50 + 
+                                  Math.sin(x * 0.01 - time * 0.5) * 30;
+                    
+                    const y = yOffset + noise + Math.sin(i * 0.5 + time) * 20;
+                    
+                    if (x === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+            }
+            ctx.stroke();
+
+            time += 0.01;
+            requestAnimationFrame(drawSilk);
+        }
+        
+        drawSilk();
+    </script>
 </body>
 </html>
