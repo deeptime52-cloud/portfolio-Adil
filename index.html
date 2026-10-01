@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADIL | Frontend Разработчик</title>
     
-    <!-- Подключаем Tailwind CSS для стилей -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script>
@@ -13,13 +13,23 @@
             theme: {
                 extend: {
                     animation: {
-                        'fade-in-up': 'fadeInUp 1s ease-out forwards',
+                        'fade-in-up': 'fadeInUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
                         'bounce-slow': 'bounce 3s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'marquee': 'marquee 25s linear infinite',
                     },
                     keyframes: {
                         fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '0%': { opacity: '0', transform: 'translateY(30px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        },
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-100%)' },
                         }
                     }
                 }
@@ -28,229 +38,481 @@
     </script>
 
     <style>
-        /* Плавный скролл */
-        html { scroll-behavior: smooth; background-color: #030712; }
-        
-        /* Стили для анимации текста (BlurText эффект) */
+        html { 
+            scroll-behavior: smooth; 
+            background-color: #030712; 
+        }
+
+        /* Кинематографический шум */
+        .bg-noise {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 9998;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Прелоадер */
+        #preloader {
+            position: fixed;
+            inset: 0;
+            background: #030712;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        /* Кастомный курсор */
+        #cursor-glow {
+            position: fixed;
+            top: 0; left: 0;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(123, 57, 179, 0) 60%);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            will-change: left, top;
+        }
+
+        @media (max-width: 768px) {
+            #cursor-glow { display: none !important; }
+        }
+
+        /* Прогресс бар */
+        #scroll-progress {
+            position: fixed;
+            top: 0; left: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #9333ea, #c084fc);
+            width: 0%;
+            z-index: 9999;
+            box-shadow: 0 0 15px rgba(147, 51, 234, 0.5);
+        }
+
+        /* Анимация текста */
         .blur-text-element {
             display: inline-block;
             opacity: 0;
-            filter: blur(10px);
-            transform: translateY(10px);
-            animation: unblur 0.8s ease-out forwards;
+            filter: blur(12px);
+            transform: translateY(15px);
+            animation: unblur 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
-
         @keyframes unblur {
             to { opacity: 1; filter: blur(0); transform: translateY(0); }
         }
 
-        /* Канвас для анимации Silk на фоне */
-        #silk-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            opacity: 0.8;
-            pointer-events: none;
-        }
-        
-        /* Интерактивная карточка проекта */
-        .spotlight-card {
-            position: relative;
-            background: rgba(17, 24, 39, 0.5); /* bg-gray-900/50 */
-            border-radius: 1.5rem;
-            border: 1px solid rgba(31, 41, 55, 1); /* border-gray-800 */
-            overflow: hidden;
-            transition: border-color 0.5s ease;
+        /* Магнитные элементы */
+        .magnetic {
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
+        /* Reveal при скролле */
+        .reveal-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .reveal-up.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 3D Карточка */
+        .spotlight-card {
+            position: relative;
+            background: rgba(17, 24, 39, 0.65);
+            backdrop-filter: blur(20px);
+            border-radius: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out, border-color 0.4s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        
         .spotlight-card::before {
             content: "";
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(123, 57, 179, 0.15), transparent 40%);
+            inset: 0;
+            background: radial-gradient(800px circle at var(--mouse-x) var(--mouse-y), rgba(147, 51, 234, 0.15), transparent 40%);
             opacity: 0;
-            transition: opacity 0.5s;
+            transition: opacity 0.4s ease;
             pointer-events: none;
             z-index: 1;
         }
         
-        .spotlight-card:hover::before { opacity: 1; }
-        .spotlight-card:hover { border-color: rgba(123, 57, 179, 0.5); }
-        
+        .card-glare {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(255,255,255,0.1), transparent 50%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+            z-index: 3;
+            mix-blend-mode: overlay;
+        }
+
+        .spotlight-card:hover::before, .spotlight-card:hover .card-glare { opacity: 1; }
+        .spotlight-card:hover { border-color: rgba(147, 51, 234, 0.4); }
         .spotlight-content { position: relative; z-index: 2; }
+        
+        /* Бегущая строка */
+        .marquee-wrapper {
+            display: flex;
+            white-space: nowrap;
+            overflow: hidden;
+            mask-image: linear-gradient(90deg, transparent, white 5%, white 95%, transparent);
+        }
     </style>
 </head>
-<body class="bg-gray-950 text-white selection:bg-[#7b39b3] selection:text-white font-sans overflow-x-hidden min-h-screen">
+<body class="bg-gray-950 text-white selection:bg-purple-600 selection:text-white font-sans overflow-x-hidden min-h-screen">
 
-    <!-- HERO SECTION (Главный экран с анимацией Silk) -->
-    <section class="relative w-full h-screen flex flex-col justify-center items-center overflow-hidden">
-        
-        <!-- Канвас для фона Silk -->
-        <canvas id="silk-canvas"></canvas>
+    <!-- Пленка с шумом -->
+    <div class="bg-noise"></div>
 
-        <!-- Затемнение снизу для плавного перехода -->
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-gray-950/40 to-gray-950 z-0 pointer-events-none"></div>
-
-        <!-- Шапка -->
-        <nav class="absolute top-0 w-full flex justify-between items-center p-6 md:px-12 z-20">
-            <div class="text-xl font-black tracking-[0.2em] text-white/90">
-                ADIL
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="flex flex-col items-center">
+            <div class="text-4xl md:text-5xl font-black tracking-[0.4em] text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500 animate-pulse mb-6">ADIL</div>
+            <div class="w-32 h-[2px] bg-gray-900 overflow-hidden relative">
+                <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-600 to-cyan-400 w-0 transition-all duration-1000 ease-in-out" id="preloader-bar"></div>
             </div>
-            <a href="#projects" class="text-sm uppercase tracking-widest hover:text-[#7b39b3] transition-colors">
-                Проекты
-            </a>
+        </div>
+    </div>
+
+    <!-- Scroll Progress -->
+    <div id="scroll-progress"></div>
+
+    <!-- Курсор -->
+    <div id="cursor-glow"></div>
+
+    <!-- HERO SECTION (Максимально убраны верхние отступы) -->
+    <section id="hero" class="relative w-full pt-24 pb-12 md:pt-32 md:pb-16 flex flex-col items-center overflow-hidden">
+        <canvas id="silk-canvas"></canvas>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-gray-950/60 to-gray-950 z-0 pointer-events-none"></div>
+
+        <!-- Навигация -->
+        <nav class="absolute top-0 w-full flex justify-between items-center p-4 md:p-6 md:px-12 z-20">
+            <div class="magnetic text-xl md:text-2xl font-black tracking-[0.2em] text-white/90 group cursor-pointer p-2 md:p-4">
+                A<span class="text-purple-500 group-hover:text-cyan-400 transition-colors duration-500">.</span>
+            </div>
+            <div class="flex items-center gap-4 md:gap-10">
+                <a href="#projects" class="hidden sm:block text-xs md:text-sm uppercase tracking-widest font-semibold text-gray-400 hover:text-white transition-colors">
+                    Проекты
+                </a>
+                <div class="magnetic">
+                    <a href="#contact" class="inline-block text-[10px] md:text-xs font-bold uppercase tracking-wider px-5 py-2.5 md:px-6 md:py-3 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-300 hover:bg-purple-600 hover:text-white hover:border-purple-500 hover:shadow-[0_0_25px_rgba(147,51,234,0.4)] transition-all duration-300">
+                        Связаться
+                    </a>
+                </div>
+            </div>
         </nav>
 
-        <!-- Центральный контент (Поверх Silk) -->
-        <div class="relative z-10 text-center px-4 max-w-4xl mx-auto flex flex-col items-center mt-10">
-            
-            <div class="inline-block px-4 py-1.5 mb-6 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-sm font-medium animate-fade-in-up">
-                👋 Frontend Разработчик
+        <!-- Главный экран (убран mt-8, добавлен минимальный mt-2) -->
+        <div class="relative z-10 text-center px-4 max-w-5xl mx-auto flex flex-col items-center mt-2 md:mt-4">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 mb-5 md:mb-6 rounded-full border border-purple-500/20 bg-black/40 backdrop-blur-md text-[10px] md:text-xs font-mono uppercase tracking-widest animate-fade-in-up text-purple-200 shadow-xl">
+                <span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                Доступен для проектов
             </div>
 
             <!-- Анимированный заголовок -->
-            <h1 class="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter mb-6 text-white drop-shadow-lg" id="blur-title"></h1>
+            <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-[5.5rem] font-black tracking-tight mb-5 md:mb-6 text-transparent bg-clip-text bg-gradient-to-br from-white via-gray-200 to-gray-500 drop-shadow-2xl flex flex-wrap justify-center leading-tight md:leading-snug pb-2" id="blur-title"></h1>
             
-            <p class="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-10 opacity-0 animate-fade-in-up" style="animation-delay: 0.6s;">
-                Превращаю сложные идеи в элегантные и производительные веб-интерфейсы. 
-                Фокус на React, анимациях и идеальном UX.
+            <p class="text-base sm:text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-8 md:mb-10 opacity-0 animate-fade-in-up font-light leading-relaxed px-2" style="animation-delay: 0.6s;">
+                Разрабатываю современные, быстрые и визуально захватывающие интерфейсы. 
+                Акцент на отзывчивость, микроанимации и архитектуру кода.
             </p>
 
-            <a href="#projects" class="group relative px-8 py-4 bg-white text-black font-semibold rounded-full overflow-hidden transition-all hover:scale-105 opacity-0 animate-fade-in-up" style="animation-delay: 0.9s;">
-                <div class="absolute inset-0 bg-gradient-to-r from-[#7b39b3] to-purple-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <span class="relative z-10 group-hover:text-white transition-colors duration-300">
-                    Смотреть проекты
-                </span>
-            </a>
-        </div>
-
-        <!-- Индикатор скролла вниз -->
-        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 opacity-50 animate-bounce-slow pointer-events-none">
-            <span class="text-xs tracking-widest uppercase">Вниз</span>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+            <div class="magnetic opacity-0 animate-fade-in-up" style="animation-delay: 0.9s;">
+                <a href="#projects" class="group relative inline-flex items-center justify-center px-6 py-3.5 md:px-8 md:py-4 bg-white text-black text-sm md:text-base font-bold tracking-wide rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(147,51,234,0.5)]">
+                    <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <span class="relative z-10 group-hover:text-white transition-colors duration-300">
+                        Посмотреть работы
+                    </span>
+                </a>
+            </div>
         </div>
     </section>
 
-    <!-- SECTION PROJECTS -->
-    <section id="projects" class="max-w-6xl mx-auto px-6 py-32 relative z-10">
-        <h2 class="text-3xl md:text-5xl font-bold mb-16 flex items-center gap-6">
-            <span class="w-16 h-[2px] bg-[#7b39b3]"></span>
-            Избранное
-        </h2>
+    <!-- Бегущая строка -->
+    <div class="w-full bg-black/50 backdrop-blur-sm border-y border-gray-900/50 py-2.5 relative z-10 overflow-hidden group">
+        <div class="marquee-wrapper group-hover:[animation-play-state:paused] transition-all">
+            <div class="flex shrink-0 animate-marquee items-center gap-6 md:gap-8 px-4 text-gray-500 font-mono text-[10px] md:text-xs uppercase tracking-widest">
+                <span class="hover:text-white transition-colors cursor-default">Frontend</span> • 
+                <span class="hover:text-cyan-400 transition-colors cursor-default">React</span> • 
+                <span class="hover:text-yellow-400 transition-colors cursor-default">JavaScript</span> • 
+                <span class="hover:text-cyan-300 transition-colors cursor-default">TailwindCSS</span> • 
+                <span class="hover:text-purple-400 transition-colors cursor-default">UI/UX</span> • 
+                <span class="hover:text-white transition-colors cursor-default">Animations</span> • 
+                <span class="hover:text-purple-500 transition-colors cursor-default">Vite</span> •
+            </div>
+            <div class="flex shrink-0 animate-marquee items-center gap-6 md:gap-8 px-4 text-gray-500 font-mono text-[10px] md:text-xs uppercase tracking-widest">
+                <span class="hover:text-white transition-colors cursor-default">Frontend</span> • 
+                <span class="hover:text-cyan-400 transition-colors cursor-default">React</span> • 
+                <span class="hover:text-yellow-400 transition-colors cursor-default">JavaScript</span> • 
+                <span class="hover:text-cyan-300 transition-colors cursor-default">TailwindCSS</span> • 
+                <span class="hover:text-purple-400 transition-colors cursor-default">UI/UX</span> • 
+                <span class="hover:text-white transition-colors cursor-default">Animations</span> • 
+                <span class="hover:text-purple-500 transition-colors cursor-default">Vite</span> •
+            </div>
+        </div>
+    </div>
 
-        <!-- Карточка Bauyrdaq -->
-        <div class="spotlight-card w-full group">
-            <div class="spotlight-content p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row gap-12 items-center">
+    <!-- SECTION PROJECTS -->
+    <section id="projects" class="max-w-7xl mx-auto px-4 sm:px-6 py-20 md:py-32 relative z-10 overflow-visible">
+        <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 md:mb-20 gap-4 reveal-up">
+            <h2 class="text-3xl sm:text-4xl md:text-6xl font-black flex items-center gap-4 md:gap-6 tracking-tight text-white">
+                <span class="w-10 md:w-24 h-[3px] md:h-[4px] bg-gradient-to-r from-purple-600 to-transparent rounded-full"></span>
+                Избранное
+            </h2>
+            <span class="text-[10px] md:text-sm font-mono text-purple-400 uppercase tracking-widest bg-purple-900/20 px-4 md:px-5 py-1.5 md:py-2 rounded-full border border-purple-500/20 backdrop-blur-sm">[ 01 Проект ]</span>
+        </div>
+
+        <div class="spotlight-card w-full cursor-pointer reveal-up" id="project-card">
+            <div class="card-glare hidden md:block"></div>
+            <div class="spotlight-content p-6 sm:p-8 md:p-12 lg:p-16 flex flex-col lg:flex-row gap-10 lg:gap-16 items-center" style="transform: translateZ(20px);">
                 
-                <!-- Информация о проекте -->
-                <div class="flex-1 order-2 lg:order-1">
-                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-[#7b39b3]/20 text-[#c88eff] rounded-full text-xs font-semibold mb-6">
-                        <span class="w-2 h-2 rounded-full bg-[#7b39b3] animate-pulse"></span>
-                        Web Development
+                <!-- Описание -->
+                <div class="flex-1 order-2 lg:order-1 w-full">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 md:px-4 md:py-1.5 bg-purple-900/30 text-purple-300 border border-purple-500/20 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider mb-6 md:mb-8 shadow-inner">
+                        <span class="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_#34d399]"></span>
+                        Qazaq Fast Food
                     </div>
                     
-                    <h3 class="text-5xl font-black mb-6 tracking-tight text-white group-hover:text-[#c88eff] transition-colors">
+                    <h3 class="text-4xl sm:text-5xl md:text-7xl font-black mb-4 md:mb-6 tracking-tighter text-white hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-purple-400 hover:to-cyan-400 transition-all duration-500">
                         Bauyrdaq
                     </h3>
                     
-                    <p class="text-gray-400 text-lg mb-8 leading-relaxed">
-                        Полноценный веб-сайт, разработанный для бренда Bauyrdaq. 
-                        Интуитивно понятный интерфейс, современный дизайн и высокая производительность, 
-                        чтобы максимально эффективно представить продукт пользователям.
+                    <p class="text-gray-400 text-sm md:text-lg mb-8 md:mb-10 leading-relaxed font-light">
+                        Современный веб-сайт для ресторана национальной кухни. 
+                        Адаптивный макет, интерактивное меню, система брони столов. Разработано с упором на производительность и премиальный UI.
                     </p>
                     
-                    <div class="flex gap-3 flex-wrap mb-10">
-                        <span class="px-4 py-2 border border-gray-700 bg-gray-800/50 rounded-lg text-sm text-gray-300 backdrop-blur-sm">HTML</span>
-                        <span class="px-4 py-2 border border-gray-700 bg-gray-800/50 rounded-lg text-sm text-gray-300 backdrop-blur-sm">CSS</span>
-                        <span class="px-4 py-2 border border-gray-700 bg-gray-800/50 rounded-lg text-sm text-gray-300 backdrop-blur-sm">JavaScript</span>
+                    <div class="flex gap-2.5 flex-wrap mb-10 md:mb-12">
+                        <span class="px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-gray-700/50 bg-black/40 text-[10px] md:text-xs font-mono text-gray-300 backdrop-blur-sm">HTML5</span>
+                        <span class="px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-gray-700/50 bg-black/40 text-[10px] md:text-xs font-mono text-gray-300 backdrop-blur-sm">CSS3</span>
+                        <span class="px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-gray-700/50 bg-black/40 text-[10px] md:text-xs font-mono text-yellow-500/80 backdrop-blur-sm">JavaScript ES6</span>
                     </div>
                     
-                    <!-- Ссылка на сайт -->
-                    <a href="https://deeptime52-cloud.github.io/bauyrdaq.kz/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-white font-medium hover:text-[#7b39b3] transition-colors group/link">
-                        Открыть проект 
-                        <svg class="transform group-hover/link:translate-x-1 transition-transform" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                    </a>
+                    <div class="magnetic inline-block">
+                        <a href="https://deeptime52-cloud.github.io/bauyrdaq.kz/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-3 md:gap-4 text-white font-semibold hover:text-purple-400 transition-colors group/link text-base md:text-lg">
+                            <span class="border-b border-purple-500/30 pb-1 group-hover/link:border-purple-400 transition-colors">Перейти на сайт</span>
+                            <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center group-hover/link:bg-purple-500/20 group-hover/link:border-purple-500/50 transition-all">
+                                <svg class="transform group-hover/link:translate-x-1 transition-transform" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </div>
+                        </a>
+                    </div>
                 </div>
 
-                <!-- Место под скриншот (Изображение вставлено) -->
-                <div class="flex-1 w-full lg:w-[500px] aspect-[16/9] bg-gray-950 rounded-2xl relative overflow-hidden order-1 lg:order-2 border border-gray-800 group/img">
-                    <div class="absolute inset-0 bg-gradient-to-tr from-[#7b39b3]/20 to-transparent z-10 pointer-events-none mix-blend-overlay"></div>
+                <!-- Макет браузера -->
+                <div class="flex-1 w-full aspect-[16/10] bg-gradient-to-br from-gray-900 via-gray-950 to-black rounded-xl md:rounded-2xl relative overflow-hidden order-1 lg:order-2 border border-gray-700/50 shadow-2xl flex flex-col group/window" style="transform: translateZ(30px);">
                     
-                    <!-- Само изображение. Обязательно чтобы файл image_a25f18.png лежал рядом с index.html -->
-                    <img src="image_a25f18.png" alt="Bauyrdaq" class="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-1000 ease-in-out relative z-0">
-                </div>
+                    <div class="h-8 md:h-10 bg-black/80 border-b border-gray-800 px-3 md:px-4 flex items-center justify-between backdrop-blur-md z-20 relative">
+                        <div class="flex items-center gap-1.5 md:gap-2.5">
+                            <span class="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#ff5f56] border border-[#e0443e]"></span>
+                            <span class="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#ffbd2e] border border-[#dea123]"></span>
+                            <span class="w-2 h-2 md:w-3 md:h-3 rounded-full bg-[#27c93f] border border-[#1aab29]"></span>
+                        </div>
+                        <div class="bg-gray-900 px-3 md:px-6 py-0.5 md:py-1 rounded-md flex items-center gap-1.5 border border-gray-800">
+                            <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-500"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            <span class="text-[9px] md:text-[11px] font-mono text-gray-400 tracking-wider">bauyrdaq.kz</span>
+                        </div>
+                        <div class="w-8 md:w-12"></div>
+                    </div>
 
+                    <div class="flex-1 p-4 md:p-6 relative flex flex-col justify-center items-center text-center overflow-hidden">
+                        <div class="absolute -top-12 -left-12 w-48 md:w-72 h-48 md:h-72 bg-yellow-500/10 rounded-full blur-[40px] md:blur-[70px] pointer-events-none group-hover/window:bg-yellow-500/20 transition-colors duration-1000"></div>
+                        <div class="absolute -bottom-12 -right-12 w-48 md:w-72 h-48 md:h-72 bg-purple-600/15 rounded-full blur-[40px] md:blur-[70px] pointer-events-none group-hover/window:bg-purple-600/30 transition-colors duration-1000"></div>
+                        
+                        <div class="animate-float z-10 relative">
+                            <div class="text-[8px] md:text-[10px] uppercase font-mono tracking-widest text-yellow-500 mb-2 md:mb-4 px-2 md:px-4 py-1 md:py-1.5 rounded-full bg-yellow-500/10 border border-yellow-500/20 inline-block backdrop-blur-md">
+                                Family Restaurant
+                            </div>
+                            <h4 class="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight text-white mb-2 md:mb-4">
+                                Вкус <span class="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-yellow-200">Традиций</span>
+                            </h4>
+                            <p class="text-gray-400 text-[10px] md:text-sm max-w-[200px] md:max-w-sm mb-4 md:mb-8 mx-auto leading-relaxed">
+                                Объединяем вековые рецепты казахской кухни и современный ритм жизни.
+                            </p>
+                            
+                            <div class="flex items-center justify-center gap-3 md:gap-4">
+                                <span class="px-4 py-1.5 md:px-6 md:py-2.5 rounded-full bg-yellow-500 text-black font-bold text-[10px] md:text-sm shadow-[0_0_15px_rgba(234,179,8,0.4)] transition-transform">
+                                    Меню
+                                </span>
+                                <span class="px-4 py-1.5 md:px-6 md:py-2.5 rounded-full border border-white/20 text-white font-medium text-[10px] md:text-sm hover:bg-white/10 transition-colors">
+                                    Бронь
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- SECTION CONTACT & FOOTER -->
-    <footer id="contact" class="border-t border-gray-800 mt-10 relative z-10 bg-gray-950 pt-20 pb-10">
-        <div class="max-w-4xl mx-auto px-6 text-center">
-            <h2 class="text-4xl font-bold mb-6 text-white">Давайте работать вместе</h2>
-            <p class="text-gray-400 mb-10 text-lg">Готов обсудить новые проекты и идеи.</p>
+    <footer id="contact" class="border-t border-gray-800/50 mt-12 md:mt-20 relative z-10 bg-gray-950 pt-20 md:pt-32 pb-8 md:pb-12 overflow-hidden reveal-up">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-32 md:h-48 bg-purple-600/10 blur-[100px] md:blur-[120px] pointer-events-none"></div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
+            <div class="inline-block mb-4 md:mb-6 px-3 md:px-4 py-1 md:py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[10px] md:text-xs font-mono uppercase tracking-widest shadow-inner">
+                Открыт к предложениям
+            </div>
+            <h2 class="text-4xl sm:text-5xl md:text-7xl font-black mb-4 md:mb-8 text-white tracking-tighter leading-tight">Давайте создадим <br/><span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-cyan-400 to-purple-400 bg-[length:200%_auto] animate-[gradient_4s_linear_infinite]">проект</span></h2>
             
-            <div class="flex flex-col sm:flex-row justify-center gap-4 mb-20">
-                <!-- Кнопка WhatsApp -->
-                <a href="https://wa.me/77079582582" target="_blank" rel="noopener noreferrer" class="px-8 py-4 bg-[#25D366]/10 text-[#25D366] border border-[#25D366]/30 font-semibold rounded-full hover:bg-[#25D366] hover:text-white transition-all flex items-center justify-center gap-3">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-                    Написать в WhatsApp
-                </a>
+            <p class="text-gray-400 mb-12 md:mb-16 text-sm md:text-xl font-light max-w-2xl mx-auto px-4">Готов обсудить ваши идеи и превратить их в современный цифровой продукт.</p>
+            
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4 md:gap-6 mb-20 md:mb-32">
+                <div class="magnetic w-full sm:w-auto">
+                    <a href="https://wa.me/77079582582" target="_blank" rel="noopener noreferrer" class="w-full px-6 py-4 md:px-8 md:py-5 bg-[#25D366]/10 text-[#25D366] border border-[#25D366]/30 font-bold rounded-full hover:bg-[#25D366] hover:text-black hover:shadow-[0_0_30px_rgba(37,211,102,0.4)] transition-all duration-300 flex items-center justify-center gap-3 text-sm md:text-base">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                        Написать в WhatsApp
+                    </a>
+                </div>
                 
-                <!-- Кнопка Позвонить -->
-                <a href="tel:+77079582582" class="px-8 py-4 bg-white/5 text-white border border-white/10 font-semibold rounded-full hover:bg-white/10 transition-all flex items-center justify-center gap-3">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                    Позвонить
-                </a>
+                <div class="magnetic w-full sm:w-auto">
+                    <a href="tel:+77079582582" class="w-full px-6 py-4 md:px-8 md:py-5 bg-white/5 text-white border border-white/10 font-bold rounded-full hover:bg-white/10 hover:border-white/30 transition-all duration-300 flex items-center justify-center gap-3 text-sm md:text-base">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                        +7 707 958 25 82
+                    </a>
+                </div>
             </div>
             
-            <div class="flex flex-col md:flex-row justify-between items-center gap-6 pt-8 border-t border-gray-800">
-                <div class="text-xl font-black tracking-[0.2em] text-white/30">
+            <!-- Нижняя плашка -->
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 md:pt-8 border-t border-gray-900/80 text-[10px] md:text-xs text-gray-600 font-mono">
+                <div class="text-xl md:text-2xl font-black tracking-[0.3em] text-white/20">
                     ADIL
                 </div>
-                <div class="flex gap-8">
-                    <a href="https://wa.me/77079582582" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-gray-400 hover:text-[#7b39b3] transition-colors">WhatsApp</a>
-                    <a href="#" class="text-sm font-medium text-gray-400 hover:text-[#7b39b3] transition-colors">Telegram</a>
-                    <a href="#" class="text-sm font-medium text-gray-400 hover:text-[#7b39b3] transition-colors">LinkedIn</a>
+                <div class="tracking-widest">
+                    © 2026. CODE & DESIGN.
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- СКРИПТЫ -->
+    <!-- JS SCRIPTS -->
     <script>
-        // --- 1. Анимация появления заголовка (BlurText) ---
-        const text = "Создаю цифровую эстетику.";
-        const container = document.getElementById('blur-title');
-        
-        text.split(' ').forEach((word, index) => {
-            const span = document.createElement('span');
-            span.textContent = word + ' ';
-            span.className = 'blur-text-element whitespace-nowrap';
-            span.style.animationDelay = `${index * 0.15}s`;
-            container.appendChild(span);
+        // --- 1. Прелоадер ---
+        window.addEventListener('load', () => {
+            const bar = document.getElementById('preloader-bar');
+            const preloader = document.getElementById('preloader');
+            
+            setTimeout(() => { bar.style.width = '100%'; }, 100);
+            
+            setTimeout(() => {
+                preloader.style.opacity = '0';
+                preloader.style.visibility = 'hidden';
+            }, 1000);
         });
 
-        // --- 2. Интерактивная карточка проекта (Spotlight) ---
-        const cards = document.querySelectorAll('.spotlight-card');
-        cards.forEach(card => {
+        // --- 2. Прогресс бар скролла ---
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("scroll-progress").style.width = scrolled + "%";
+        });
+
+        // --- 3. Анимация заголовка (слова раздельно с отступом) ---
+        const titleWords = ["Создаю", "цифровую", "эстетику."];
+        const titleContainer = document.getElementById('blur-title');
+        
+        titleWords.forEach((word, index) => {
+            const span = document.createElement('span');
+            span.textContent = word;
+            span.className = 'blur-text-element mr-2 md:mr-4 last:mr-0 inline-block';
+            span.style.animationDelay = `${index * 0.15 + 0.9}s`; 
+            titleContainer.appendChild(span);
+        });
+
+        // --- 4. Плавный неоновый курсор (Только для ПК) ---
+        if (window.innerWidth > 768) {
+            const cursorGlow = document.getElementById('cursor-glow');
+            let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+            let cursorX = mouseX, cursorY = mouseY;
+
+            window.addEventListener('mousemove', e => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            function animateCursor() {
+                cursorX += (mouseX - cursorX) * 0.12;
+                cursorY += (mouseY - cursorY) * 0.12;
+                cursorGlow.style.left = `${cursorX}px`;
+                cursorGlow.style.top = `${cursorY}px`;
+                requestAnimationFrame(animateCursor);
+            }
+            animateCursor();
+        }
+
+        // --- 5. Магнитные кнопки (Только для ПК) ---
+        if (window.innerWidth > 768) {
+            const magneticEls = document.querySelectorAll('.magnetic');
+            magneticEls.forEach(el => {
+                el.addEventListener('mousemove', (e) => {
+                    const rect = el.getBoundingClientRect();
+                    const h = rect.width / 2;
+                    const v = rect.height / 2;
+                    const x = e.clientX - rect.left - h;
+                    const y = e.clientY - rect.top - v;
+                    el.firstElementChild.style.transform = `translate(${x * 0.2}px, ${y * 0.2}px)`;
+                });
+                el.addEventListener('mouseleave', () => {
+                    el.firstElementChild.style.transform = `translate(0px, 0px)`;
+                });
+                el.firstElementChild.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)';
+            });
+        }
+
+        // --- 6. 3D Spotlight эффект на карточке (Только для ПК) ---
+        const card = document.getElementById('project-card');
+        
+        if (window.innerWidth > 768) {
             card.addEventListener('mousemove', e => {
                 const rect = card.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
+                
                 card.style.setProperty('--mouse-x', `${x}px`);
                 card.style.setProperty('--mouse-y', `${y}px`);
-            });
-        });
 
-        // --- 3. Генерация фона "Silk" на Canvas ---
-        // Имитация эффекта Silk (шелковые волны)
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = ((y - centerY) / centerY) * -4; 
+                const rotateY = ((x - centerX) / centerX) * 4;  
+                
+                card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                card.style.transition = `transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)`;
+            });
+            card.addEventListener('mouseenter', () => {
+                card.style.transition = `transform 0.1s ease-out, border-color 0.4s ease`;
+            });
+        }
+
+        // --- 7. Анимация появления при скролле (Scroll Reveal) ---
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-up').forEach(el => observer.observe(el));
+
+        // --- 8. Улучшенный Silk Waves Canvas ---
         const canvas = document.getElementById('silk-canvas');
         const ctx = canvas.getContext('2d');
         let width, height;
@@ -258,43 +520,34 @@
 
         function resize() {
             width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
+            const hero = document.getElementById('hero');
+            height = canvas.height = hero ? hero.offsetHeight : window.innerHeight;
         }
         window.addEventListener('resize', resize);
         resize();
 
         function drawSilk() {
             ctx.clearRect(0, 0, width, height);
-            
-            ctx.strokeStyle = 'rgba(123, 57, 179, 0.15)'; 
+            ctx.strokeStyle = 'rgba(147, 51, 234, 0.15)'; 
             ctx.lineWidth = 1;
 
-            const linesCount = 40;
+            const linesCount = window.innerWidth > 768 ? 28 : 18; 
             const spacing = height / linesCount;
 
             ctx.beginPath();
             for (let i = 0; i < linesCount; i++) {
                 const yOffset = i * spacing;
-                
-                for (let x = 0; x < width; x += 10) {
-                    const noise = Math.sin(x * 0.005 + time) * 50 + 
-                                  Math.sin(x * 0.01 - time * 0.5) * 30;
-                    
-                    const y = yOffset + noise + Math.sin(i * 0.5 + time) * 20;
-                    
-                    if (x === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
-                    }
+                for (let x = 0; x < width; x += 20) {
+                    const noise = Math.sin(x * 0.004 + time) * 55 + Math.sin(x * 0.008 - time * 0.5) * 20;
+                    const y = yOffset + noise + Math.sin(i * 0.4 + time) * 25;
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
                 }
             }
             ctx.stroke();
-
-            time += 0.01;
+            time += 0.006;
             requestAnimationFrame(drawSilk);
         }
-        
         drawSilk();
     </script>
 </body>
